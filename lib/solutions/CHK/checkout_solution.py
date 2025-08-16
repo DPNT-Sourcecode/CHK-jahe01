@@ -25,16 +25,38 @@ class CheckoutSolution:
         amount_of_B = counts.get('B', 0)
         amount_of_C = counts.get('C', 0)
         amount_of_D = counts.get('D', 0)
+        amount_of_E = counts.get('E', 0)
 
-        discount_A = (amount_of_A // 3)
-        discount_B = (amount_of_B // 2)
+        # A calculation
+        discount_A_200 = amount_of_A // 5
+        remainder_after_5 = amount_of_A % 5
 
-        individual_A = amount_of_A - (discount_A * 3)
-        individual_B = amount_of_B - (discount_B * 2)
+        discount_A_130 = remainder_after_5 // 3
+        remainder_after_3 = remainder_after_5 % 3
 
-        total = (amount_of_D * 15) + (amount_of_C * 20) + (discount_A * 130) + (discount_B * 45) + (individual_A * 50) + (individual_B * 30)
+        total_A = discount_A_200 * 200 + discount_A_130 * 130 + remainder_after_3 * 50
+
+
+        # E Calculation
+        free_Bs = amount_of_E // 2
+        effective_B = max(0, amount_of_B - free_Bs)
+        total_E = amount_of_E * 40
+
+        # B Calculation
+        discount_B = effective_B // 2
+        remainder_B = effective_B % 2
+        total_B = discount_B * 45 + remainder_B * 30
+
+        total = (amount_of_D * 15) + (amount_of_C * 20) + (total_A) + (total_B) + (total_E)
 
         return total
 
 
 
+if __name__ == "__main__":
+    checkout = CheckoutSolution()
+    print(checkout.checkout("ABCD"))  # Example usage
+    print(checkout.checkout("AABBCDE"))  # Another example
+    print(checkout.checkout("XYZ"))  # Invalid input
+    print(checkout.checkout(""))  # Empty input
+    print(checkout.checkout("A" * 10))  # Large input for A
