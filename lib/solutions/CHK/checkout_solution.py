@@ -144,7 +144,7 @@ class CheckoutSolution:
         """3R -> 1Q free"""
         return max(0, amount_Q - (amount_R // 3))
 
-    def adjust_M_for_N(self, amount_M, amount_N):
+    def calculate_amount_of_M(self, amount_M, amount_N):
         """3N -> 1M free"""
         return max(0, amount_M - (amount_N // 3))
 
@@ -179,12 +179,12 @@ class CheckoutSolution:
         amount = {sku: counts.get(sku, 0) for sku in ascii_uppercase}
 
         # Apply cross-item freebies by adjusting the affected counts
-        eff_B = self.calculate_amount_of_B(amount['B'], amount['E'])
-        eff_M = self.adjust_M_for_N(amount['M'], amount['N'])
-        eff_Q = self.calculate_amount_of_Q(amount['Q'], amount['R'])
+        freebie_adjusted_B = self.calculate_amount_of_B(amount['B'], amount['E'])
+        freebie_adjusted_M = self.calculate_amount_of_M(amount['M'], amount['N'])
+        freebie_adjusted_Q = self.calculate_amount_of_Q(amount['Q'], amount['R'])
 
         # Start with adjusted counts overrides
-        override_counts = {'B': eff_B, 'M': eff_M, 'Q': eff_Q}
+        override_counts = {'B': freebie_adjusted_B, 'M': freebie_adjusted_M, 'Q': freebie_adjusted_Q}
 
         # Handle the group offer for S/T/X/Y/Z, then zero them so they don't get priced twice
         group_total = self.price_group_STXYZ({k: amount[k] for k in ('S', 'T', 'X', 'Y', 'Z')})
@@ -293,3 +293,4 @@ def run_tests_r5():
 
 if __name__ == "__main__":
     run_tests_r5()
+
