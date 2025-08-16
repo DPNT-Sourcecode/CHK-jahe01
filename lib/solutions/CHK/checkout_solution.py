@@ -14,6 +14,19 @@ class CheckoutSolution:
         if any(ch not in allowed for ch in skus):
             return None
         return Counter(skus)
+    
+    # A calculation - always pick cheapest combination
+    def price_A(self, amount):
+        best = amount * 50
+        for num5 in range(amount // 5 + 1):
+            for num3 in range((amount - num5 * 5) // 3 + 1):
+                leftover = amount - num5 * 5 - num3 * 3
+                total = num5 * 200 + num3 * 130 + leftover * 50
+                best = min(best, total)
+        return best
+
+    
+
 
     # skus = unicode string
     def checkout(self, skus):
@@ -28,14 +41,9 @@ class CheckoutSolution:
         amount_of_E = counts.get('E', 0)
         amount_of_F = counts.get('F', 0)
 
-        # A calculation
-        discount_A_200 = amount_of_A // 5
-        remainder_after_5 = amount_of_A % 5
 
-        discount_A_130 = remainder_after_5 // 3
-        remainder_after_3 = remainder_after_5 % 3
-
-        total_A = discount_A_200 * 200 + discount_A_130 * 130 + remainder_after_3 * 50
+        # A Calculation
+        total_A = self.price_A(amount_of_A)
 
 
         # E Calculation
@@ -103,10 +111,6 @@ if __name__ == "__main__":
 
     print("\nEdge cases:")
     print(checkout.checkout(""), "expected 0")
-
-
-
-
 
 
 
