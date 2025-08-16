@@ -1,5 +1,5 @@
 from collections import Counter
-from string import ascii_unit_pricepercase
+from string import ascii_uppercase
 
 UNIT_PRICE = {
     "A": 50, "B": 30, "C": 20, "D": 15, "E": 40,
@@ -30,7 +30,7 @@ class CheckoutSolution:
             return None
         if skus == "":
             return Counter()
-        if any(ch not in ascii_unit_pricepercase for ch in skus):
+        if any(ch not in ascii_uppercase for ch in skus):
             return None
         return Counter(skus)
 
@@ -165,7 +165,7 @@ class CheckoutSolution:
         if counts is None:
             return -1
 
-        amount = {sku: counts.get(sku, 0) for sku in ascii_unit_pricepercase}
+        amount = {sku: counts.get(sku, 0) for sku in ascii_uppercase}
         freebie_adjusted_B = self.calculate_amount_of_B(amount['B'], amount['E'])
         freebie_adjusted_M = self.calculate_amount_of_M(amount['M'], amount['N'])
         freebie_adjusted_Q = self.calculate_amount_of_Q(amount['Q'], amount['R'])
@@ -180,7 +180,7 @@ class CheckoutSolution:
 
         items_total = sum(
             getattr(self, f"price_{sku}")(override_counts.get(sku, amount[sku]))
-            for sku in ascii_unit_pricepercase
+            for sku in ascii_uppercase
             if getattr(self, f"price_{sku}", None) and override_counts.get(sku, amount[sku]) > 0
         )
 
@@ -195,4 +195,5 @@ if __name__ == "__main__":
     print(checkout.checkout("INVALID"))  # Should return -1
     print(checkout.checkout(""))        # Should return 0
     print(checkout.checkout("A"))       # Should return 50
+
 
