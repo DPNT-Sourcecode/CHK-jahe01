@@ -233,13 +233,122 @@ class CheckoutSolution:
         return group_pricing_totals + items_total
 
 
-
 if __name__ == "__main__":
     checkout = CheckoutSolution()
-    print(checkout.checkout("AABCD"))  # Example usage
-    print(checkout.checkout("EEB"))    # Example usage
-    print(checkout.checkout("STXYZ"))  # Example usage
-    print(checkout.checkout("INVALID"))  # Should return -1
-    print(checkout.checkout(""))        # Should return 0
-    print(checkout.checkout("A"))       # Should return 50
+
+    print("Smoke tests:")
+    print(checkout.checkout("AABCD"), "expected 165")   # 2A(100)+B(30)+C(20)+D(15)
+    print(checkout.checkout("EEB"), "expected 80")      # 2E=80, B free
+    print(checkout.checkout("STXYZ"), "expected 82")    # group 45 + leftovers 37
+    print(checkout.checkout(""), "expected 0")          # empty = 0
+
+    print("\nInvalid inputs:")
+    print(checkout.checkout("a"), "expected -1")
+    print(checkout.checkout("-"), "expected -1")
+    print(checkout.checkout("ABCa"), "expected -1")
+    print(checkout.checkout(123), "expected -1")
+    print(checkout.checkout(None), "expected -1")
+    print(checkout.checkout("A*B"), "expected -1")
+
+    print("\nA multi-pricing (3A=130, 5A=200):")
+    print(checkout.checkout("A"), "expected 50")
+    print(checkout.checkout("AA"), "expected 100")
+    print(checkout.checkout("AAA"), "expected 130")
+    print(checkout.checkout("AAAA"), "expected 180")     # 130 + 50
+    print(checkout.checkout("AAAAA"), "expected 200")
+    print(checkout.checkout("AAAAAA"), "expected 250")   # 200 + 50
+    print(checkout.checkout("AAAAAAAAA"), "expected 380")# 5A(200)+3A(130)+1A(50)
+
+    print("\nB + E freebie (2E -> 1B free) and B deal (2B=45):")
+    print(checkout.checkout("B"), "expected 30")
+    print(checkout.checkout("BB"), "expected 45")
+    print(checkout.checkout("BBB"), "expected 75")
+    print(checkout.checkout("E"), "expected 40")
+    print(checkout.checkout("EB"), "expected 70")         # no free (only 1E)
+    print(checkout.checkout("EEB"), "expected 80")        # B free
+    print(checkout.checkout("EEBB"), "expected 110")      # B eff=1 -> 30
+    print(checkout.checkout("EEBBB"), "expected 125")     # B eff=2 -> 45; 80+45
+    print(checkout.checkout("EEEEBBB"), "expected 190")   # 4E=160, free 2B -> 1B=30
+
+    print("\nF self-freebie (buy 2 get 1 free -> 3F=20):")
+    print(checkout.checkout("F"), "expected 10")
+    print(checkout.checkout("FF"), "expected 20")
+    print(checkout.checkout("FFF"), "expected 20")
+    print(checkout.checkout("FFFF"), "expected 30")
+    print(checkout.checkout("FFFFFF"), "expected 40")
+
+    print("\nH multi-pricing (5H=45, 10H=80):")
+    print(checkout.checkout("H"*5), "expected 45")
+    print(checkout.checkout("H"*10), "expected 80")
+    print(checkout.checkout("H"*11), "expected 90")       # 80 + 10
+    print(checkout.checkout("H"*15), "expected 125")      # 80 + 45
+
+    print("\nUpdated K pricing (K=70, 2K=120):")
+    print(checkout.checkout("K"), "expected 70")
+    print(checkout.checkout("KK"), "expected 120")
+    print(checkout.checkout("KKK"), "expected 190")       # 120 + 70
+
+    print("\nP, Q, V offers:")
+    print(checkout.checkout("P"*5), "expected 200")       # 5P=200
+    print(checkout.checkout("QQQ"), "expected 80")        # 3Q=80
+    print(checkout.checkout("QQQQ"), "expected 110")      # 80 + 30
+    print(checkout.checkout("VV"), "expected 90")         # 2V=90
+    print(checkout.checkout("VVV"), "expected 130")       # 3V=130
+    print(checkout.checkout("VVVV"), "expected 180")      # 2+2 or 3+1
+    print(checkout.checkout("VVVVV"), "expected 220")     # 3+2
+
+    print("\nU self-freebie (3U get 1 free -> each 4 costs 3*U):")
+    print(checkout.checkout("U"*4), "expected 120")
+    print(checkout.checkout("U"*5), "expected 160")
+
+    print("\nGroup offer: any 3 of (S,T,X,Y,Z) for 45 (S=20, T=20, X=17, Y=20, Z=21):")
+    # Singles
+    print(checkout.checkout("S"), "expected 20")
+    print(checkout.checkout("T"), "expected 20")
+    print(checkout.checkout("X"), "expected 17")
+    print(checkout.checkout("Y"), "expected 20")
+    print(checkout.checkout("Z"), "expected 21")
+    # Exact groups of 3
+    print(checkout.checkout("STX"), "expected 45")        # 20+20+17 -> 45
+    print(checkout.checkout("SZZ"), "expected 45")        # 20+21+21 -> 45
+    print(checkout.checkout("SSS"), "expected 45")
+    print(checkout.checkout("ZZZ"), "expected 45")
+    print(checkout.checkout("XXX"), "expected 45")
+    # Groups + leftovers
+    print(checkout.checkout("STXYZ"), "expected 82")      # 45 + (20+17)
+    print(checkout.checkout("ZZZZ"), "expected 66")       # 45 + 21
+    print(checkout.checkout("ZZZXX"), "expected 79")      # 45 + 34
+    print(checkout.checkout("SSTT"), "expected 65")       # 45 + 20
+    print(checkout.checkout("STXX"), "expected 62")       # 45 + 17
+    print(checkout.checkout("SSSZ"), "expected 65")       # 45 + 20
+    print(checkout.checkout("ZX"), "expected 38")         # no group
+    print(checkout.checkout("STXYZST"), "expected 107")   # 2 groups (top 6) + leftover X
+
+    print("\nOther simple items (no special offers):")
+    print(checkout.checkout("C"), "expected 20")
+    print(checkout.checkout("D"), "expected 15")
+    print(checkout.checkout("G"), "expected 20")
+    print(checkout.checkout("I"), "expected 35")
+    print(checkout.checkout("J"), "expected 60")
+    print(checkout.checkout("L"), "expected 90")
+    print(checkout.checkout("O"), "expected 10")
+    print(checkout.checkout("R"), "expected 50")
+    print(checkout.checkout("W"), "expected 20")
+
+    print("\nR→Q and N→M freebies:")
+    print(checkout.checkout("RRRQ"), "expected 150")      # Q free
+    print(checkout.checkout("RRRQQQ"), "expected 210")    # Q eff=2 -> 60
+    print(checkout.checkout("NNNM"), "expected 120")      # M free
+    print(checkout.checkout("NNNMM"), "expected 135")     # M eff=1 -> 15
+    print(checkout.checkout("NNNNMM"), "expected 175")    # 160 + 15
+
+    print("\nMixed baskets (overlaps/group/freebies):")
+    print(checkout.checkout("ABCD"), "expected 115")
+    print(checkout.checkout("ABCDE"), "expected 155")
+    print(checkout.checkout("EEBZ"), "expected 101")      # 80 + Z(21); B free
+    print(checkout.checkout("EEFFBZZZ"), "expected 145")  # 80 + 20 + 0 + 45
+    print(checkout.checkout("FFFABC"), "expected 120")    # 20 + 50 + 30 + 20
+    print(checkout.checkout("STXYZAB"), "expected 162")   # group 82 + A(50) + B(30)
+    print(checkout.checkout("RRRQQQNNNM"), "expected 330")# 150 + 60 + 120 + 0
+
 
