@@ -21,8 +21,11 @@ class CheckoutSolution:
 
         total = (amount_of_D * 15) + (amount_of_C * 20) + (discount_A * 130) + (discount_B * 45) + (individual_A * 50) + (individual_B * 30)
 
+        return total
 
 if __name__ == "__main__":
     checkout = CheckoutSolution()
     print(checkout.checkout("ABCD"))  # Example usage
     print(checkout.checkout("AAABBBCCCDDD"))  # Another example
+    print(checkout.checkout("AAAAAAAABBBBBBBBBCCCDDD"))  # Another example
+
