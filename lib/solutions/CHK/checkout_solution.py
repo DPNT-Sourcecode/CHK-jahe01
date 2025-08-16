@@ -10,7 +10,7 @@ class CheckoutSolution:
             return None
         if skus == "":
             return Counter()  # empty is valid -> totals 0
-        allowed = {"A", "B", "C", "D", "E"}
+        allowed = {"A", "B", "C", "D", "E", "F"}
         if any(ch not in allowed for ch in skus):
             return None
         return Counter(skus)
@@ -26,6 +26,7 @@ class CheckoutSolution:
         amount_of_C = counts.get('C', 0)
         amount_of_D = counts.get('D', 0)
         amount_of_E = counts.get('E', 0)
+        amount_of_F = counts.get('F', 0)
 
         # A calculation
         discount_A_200 = amount_of_A // 5
@@ -47,9 +48,15 @@ class CheckoutSolution:
         remainder_B = effective_B % 2
         total_B = discount_B * 45 + remainder_B * 30
 
-        total = (amount_of_D * 15) + (amount_of_C * 20) + (total_A) + (total_B) + (total_E)
+        # F Calculation
+        discount_F = amount_of_F // 3
+        new_amount_of_F = amount_of_F - discount_F
+        total_F = new_amount_of_F * 10
+
+        total = (amount_of_D * 15) + (amount_of_C * 20) + (total_A) + (total_B) + (total_E) + (total_F)
 
         return total
+
 
 
 
