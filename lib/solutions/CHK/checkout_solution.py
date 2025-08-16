@@ -36,13 +36,8 @@ class CheckoutSolution:
 
         return total
 
-if __name__ == "__main__":
-    checkout = CheckoutSolution()
-    print(checkout.checkout("ABCD"))  # Example usage
-    print(checkout.checkout("AAABBBCCCDDD"))  # Another example
-    print(checkout.checkout("AAAAAAAABBBBBBBBBCCCDDD"))  # Another example
-    print(checkout.checkout("-"))  # Another example
-    print(checkout.checkout("ABCd"))  # Another example
+
+
 
 
 
