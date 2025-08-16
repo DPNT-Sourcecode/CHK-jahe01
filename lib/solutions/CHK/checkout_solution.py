@@ -105,48 +105,24 @@ class CheckoutSolution:
         # amounts for A..Z
         amount = {sku: counts.get(sku, 0) for sku in ascii_uppercase}
 
-        # Compute totals for the “giver” items (E, N, R) normally
+        # Adjust counts for items affected by cross-item freebies
+        eff_B = self.adjust_B_for_E(amount['B'], amount['E'])  # 2E -> 1B free
+        eff_M = self.adjust_M_for_N(amount['M'], amount['N'])  # 3N -> 1M free
+        eff_Q = self.adjust_Q_for_R(amount['Q'], amount['R'])  # 3R -> 1Q free
 
-        # Adjust the affected items’ counts (B, M, Q) using helpers
-        amount['B'] = self.adjust_B_for_E(amount['B'], amount['E'])
-        amount['M'] = self.adjust_M_for_N(amount['M'], amount['N'])
-        amount['Q'] = self.adjust_Q_for_R(amount['Q'], amount['R'])
+        # Use adjusted counts for B, M, Q; raw counts for everything else
+        override_counts = {'B': eff_B, 'M': eff_M, 'Q': eff_Q}
 
-        # Price all other items (with adjusted counts where applicable)
-        total_A = self.price_A(amount['A'])
-        total_B = self.price_B(amount['B'])
-        total_C = self.price_C(amount['C'])
-        total_D = self.price_D(amount['D'])
-        total_E = self.price_E(amount['E'])
-        total_F = self.price_F(amount['F'])
-        total_G = self.price_G(amount['G'])
-        total_H = self.price_H(amount['H'])
-        total_I = self.price_I(amount['I'])
-        total_J = self.price_J(amount['J'])
-        total_K = self.price_K(amount['K'])
-        total_L = self.price_L(amount['L'])
-        total_M = self.price_M(amount['M'])
-        total_N = self.price_N(amount['N'])
-        total_O = self.price_O(amount['O'])
-        total_P = self.price_P(amount['P'])
-        total_Q = self.price_Q(amount['Q'])
-        total_R = self.price_R(amount['R'])
-        total_S = self.price_S(amount['S'])
-        total_T = self.price_T(amount['T'])
-        total_U = self.price_U(amount['U'])
-        total_V = self.price_V(amount['V'])
-        total_W = self.price_W(amount['W'])
-        total_X = self.price_X(amount['X'])
-        total_Y = self.price_Y(amount['Y'])
-        total_Z = self.price_Z(amount['Z'])
 
-        return (
-            total_A + total_B + total_C + total_D + total_E + total_F +
-            total_G + total_H + total_I + total_J + total_K + total_L +
-            total_M + total_N + total_O + total_P + total_Q + total_R +
-            total_S + total_T + total_U + total_V + total_W + total_X +
-            total_Y + total_Z
-        )
+        total = 0
+        for sku in ascii_uppercase:  # 'A'..'Z'
+            pricer = getattr(self, f"price_{sku}", None)
+            if pricer is None:
+                continue  # or raise if you'd rather fail loudly
+            n = override_counts.get(sku, amount[sku])
+            if n:  # skip zero-quantity items
+                total += pricer(n)
+
 
 
 # ----------------- quick tests (same style as before) -----------------
@@ -232,9 +208,3 @@ if __name__ == "__main__":
 
     print("\nEdge cases:")
     print(checkout.checkout(""), "expected 0")
-
-
-
-
-
-
