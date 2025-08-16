@@ -195,5 +195,3 @@ if __name__ == "__main__":
     print(checkout.checkout("INVALID"))  # Should return -1
     print(checkout.checkout(""))        # Should return 0
     print(checkout.checkout("A"))       # Should return 50
-
-
