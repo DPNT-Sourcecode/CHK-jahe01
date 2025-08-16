@@ -10,7 +10,7 @@ class CheckoutSolution:
             return None
         if skus == "":
             return Counter()  # empty is valid -> totals 0
-        allowed = {"A", "B", "C", "D"}
+        allowed = {"A", "B", "C", "D", "E"}
         if any(ch not in allowed for ch in skus):
             return None
         return Counter(skus)
@@ -53,10 +53,3 @@ class CheckoutSolution:
 
 
 
-if __name__ == "__main__":
-    checkout = CheckoutSolution()
-    print(checkout.checkout("ABCD"))  # Example usage
-    print(checkout.checkout("AABBCDE"))  # Another example
-    print(checkout.checkout("XYZ"))  # Invalid input
-    print(checkout.checkout(""))  # Empty input
-    print(checkout.checkout("A" * 10))  # Large input for A
