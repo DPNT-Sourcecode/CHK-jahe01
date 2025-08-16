@@ -68,16 +68,25 @@ class CheckoutSolution:
 
     def price_H(self, amount):
         unit_price = UNIT_PRICE['H']
-        best = amount * unit_price
-        for num10 in range(amount // 10 + 1):
-            rem10 = amount - 10 * num10
-            for num5 in range(rem10 // 5 + 1):
-                rem = rem10 - 5 * num5
-                total = num10 * BUNDLE_DEALS["H"]["PRICE_FOR_10"] \
-                        + num5 * BUNDLE_DEALS["H"]["PRICE_FOR_5"] \
-                        + rem * unit_price
-                best = min(best, total)
-        return best
+        lowest_total_price = amount * unit_price  # baseline with no bundles
+
+        # Explore all possible combinations of 10-pack and 5-pack bundles
+        for num_ten_pack_bundles in range(amount // 10 + 1):
+            remaining_after_tens = amount - 10 * num_ten_pack_bundles
+
+            for num_five_pack_bundles in range(remaining_after_tens // 5 + 1):
+                remaining_singles = remaining_after_tens - 5 * num_five_pack_bundles
+
+                total_for_this_combo = (
+                    num_ten_pack_bundles * BUNDLE_DEALS["H"]["PRICE_FOR_10"]
+                    + num_five_pack_bundles * BUNDLE_DEALS["H"]["PRICE_FOR_5"]
+                    + remaining_singles * unit_price
+                )
+
+                lowest_total_price = min(lowest_total_price, total_for_this_combo)
+
+        return lowest_total_price
+
 
     def price_I(self, amount): return amount * UNIT_PRICE['I']
     def price_J(self, amount): return amount * UNIT_PRICE['J']
@@ -113,22 +122,37 @@ class CheckoutSolution:
 
     def price_U(self, amount):
         unit_price = UNIT_PRICE['U']
-        grounit_prices = amount // 4
-        rem = amount % 4
-        return grounit_prices * BUNDLE_DEALS["U"]["PRICE_FOR_4"] + rem * unit_price
+        amount_of_discount_sets = amount // 4        # every 4 U's form one discount set (3 paid, 1 free)
+        remaining_singles = amount % 4               # leftovers not covered by a discount set
+
+        total_price = (
+            amount_of_discount_sets * BUNDLE_DEALS["U"]["PRICE_FOR_4"]
+            + remaining_singles * unit_price
+        )
+        return total_price
+
 
     def price_V(self, amount):
         unit_price = UNIT_PRICE['V']
-        best = amount * unit_price
-        for num3 in range(amount // 3 + 1):
-            rem3 = amount - 3 * num3
-            num2 = rem3 // 2
-            rem = rem3 % 2
-            total = num3 * BUNDLE_DEALS["V"]["PRICE_FOR_3"] \
-                    + num2 * BUNDLE_DEALS["V"]["PRICE_FOR_2"] \
-                    + rem * unit_price
-            best = min(best, total)
-        return best
+        lowest_total_price = amount * unit_price  # total_without_discounts baseline
+
+        # Explore all possible combinations of bundle usage:
+        # try every feasible number of 3-pack bundles, then fill with 2-packs, then singles.
+        for num_three_pack_bundles in range(amount // 3 + 1):
+            remaining_after_three_packs = amount - 3 * num_three_pack_bundles
+            num_two_pack_bundles = remaining_after_three_packs // 2
+            remaining_singles = remaining_after_three_packs % 2
+
+            total_for_this_combo = (
+                num_three_pack_bundles * BUNDLE_DEALS["V"]["PRICE_FOR_3"]
+                + num_two_pack_bundles * BUNDLE_DEALS["V"]["PRICE_FOR_2"]
+                + remaining_singles * unit_price
+            )
+
+            lowest_total_price = min(lowest_total_price, total_for_this_combo)
+
+        return lowest_total_price
+
 
     # ----------- Freebie adjusters -----------
 
@@ -144,19 +168,22 @@ class CheckoutSolution:
     # ----------- Grounit_price offer STXYZ -----------
 
     def group_price_calculator_STXYZ(self, counts):
-        grounit_price = ('S', 'T', 'X', 'Y', 'Z')
+        valid_items = ('S', 'T', 'X', 'Y', 'Z')
         prices = []
-        for sku in grounit_price:
+        for sku in valid_items:
             prices.extend([UNIT_PRICE[sku]] * counts.get(sku, 0))
         if not prices:
             return 0
-        total_base = sum(prices)
-        grounit_prices = len(prices) // 3
-        if grounit_prices == 0:
-            return total_base
+
+        total_without_discounts = sum(prices)
+        amount_of_discount_sets = len(prices) // 3
+        if amount_of_discount_sets == 0:
+            return total_without_discounts
+
         prices.sort(reverse=True)
-        replaced_sum = sum(prices[:3 * grounit_prices])
-        return total_base - replaced_sum + grounit_prices * 45
+        sum_of_most_expensive_items = sum(prices[:3 * amount_of_discount_sets])
+        return total_without_discounts - sum_of_most_expensive_items + amount_of_discount_sets * 45
+
 
     # ---------------- checkout ----------------
 
