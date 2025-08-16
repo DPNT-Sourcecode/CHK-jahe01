@@ -208,7 +208,7 @@ class CheckoutSolution:
 
         amount = {sku: counts.get(sku, 0) for sku in ascii_uppercase}
 
-        # renamed: calculate_amount_of_X -> calculate_new_amount_of_X
+        
         freebie_adjusted_B = self.calculate_new_amount_of_B(amount['B'], amount['E'])
         freebie_adjusted_M = self.calculate_new_amount_of_M(amount['M'], amount['N'])
         freebie_adjusted_Q = self.calculate_new_amount_of_Q(amount['Q'], amount['R'])
@@ -221,6 +221,8 @@ class CheckoutSolution:
 
         # Calculate group pricing for STXYZ
         group_pricing_totals = self.group_price_calculator_STXYZ({k: amount[k] for k in ('S', 'T', 'X', 'Y', 'Z')})
+        
+        # Setting them to 0 to avoid double counting
         for k in ('S', 'T', 'X', 'Y', 'Z'):
             override_counts[k] = 0
 
@@ -350,5 +352,6 @@ if __name__ == "__main__":
     print(checkout.checkout("FFFABC"), "expected 120")    # 20 + 50 + 30 + 20
     print(checkout.checkout("STXYZAB"), "expected 162")   # group 82 + A(50) + B(30)
     print(checkout.checkout("RRRQQQNNNM"), "expected 330")# 150 + 60 + 120 + 0
+
 
 
