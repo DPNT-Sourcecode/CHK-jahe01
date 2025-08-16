@@ -10,6 +10,23 @@ UNIT_PRICE = {
     "Z": 21,
 }
 
+BUNDLE_DEALS = {
+    "A": {"PRICE_FOR_5": 200, "PRICE_FOR_3": 130},
+    "B": {"PRICE_FOR_2": 45},
+    "H": {"PRICE_FOR_10": 80, "PRICE_FOR_5": 45},
+    "K": {"PRICE_FOR_2": 120},           # R5
+    "P": {"PRICE_FOR_5": 200},
+    "Q": {"PRICE_FOR_3": 80},
+    "V": {"PRICE_FOR_3": 130, "PRICE_FOR_2": 90},
+
+    # Self-freebies expressed as bundles priced via UNIT_PRICE
+    # F: buy 2 get 1 free -> every 3 cost 2×F
+    "F": {"PRICE_FOR_3": 2 * UNIT_PRICE["F"]},
+    # U: 3U get one free -> every 4 cost 3×U
+    "U": {"PRICE_FOR_4": 3 * UNIT_PRICE["U"]},
+}
+
+
 class CheckoutSolution:
 
     def _validate_and_count(self, skus):
@@ -119,11 +136,11 @@ class CheckoutSolution:
 
     # ----------- Freebie adjusters (separate from pricing) -----------
 
-    def adjust_B_for_E(self, amount_B, amount_E):
+    def calculate_amount_of_B(self, amount_B, amount_E):
         """2E -> 1B free"""
         return max(0, amount_B - (amount_E // 2))
 
-    def adjust_Q_for_R(self, amount_Q, amount_R):
+    def calculate_amount_of_Q(self, amount_Q, amount_R):
         """3R -> 1Q free"""
         return max(0, amount_Q - (amount_R // 3))
 
@@ -162,9 +179,9 @@ class CheckoutSolution:
         amount = {sku: counts.get(sku, 0) for sku in ascii_uppercase}
 
         # Apply cross-item freebies by adjusting the affected counts
-        eff_B = self.adjust_B_for_E(amount['B'], amount['E'])
+        eff_B = self.calculate_amount_of_B(amount['B'], amount['E'])
         eff_M = self.adjust_M_for_N(amount['M'], amount['N'])
-        eff_Q = self.adjust_Q_for_R(amount['Q'], amount['R'])
+        eff_Q = self.calculate_amount_of_Q(amount['Q'], amount['R'])
 
         # Start with adjusted counts overrides
         override_counts = {'B': eff_B, 'M': eff_M, 'Q': eff_Q}
@@ -276,7 +293,3 @@ def run_tests_r5():
 
 if __name__ == "__main__":
     run_tests_r5()
-
-
-
-
