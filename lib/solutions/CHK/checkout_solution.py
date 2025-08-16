@@ -53,39 +53,5 @@ class CheckoutSolution:
 
 
 
-if __name__ == "__main__":
-    checkout = CheckoutSolution()
-
-    print("Invalid cases:")
-    print(checkout.checkout("a"), "expected -1")
-    print(checkout.checkout("-"), "expected -1")
-    print(checkout.checkout("ABCa"), "expected -1")
-    print(checkout.checkout(123), "expected -1")
-    print(checkout.checkout(None), "expected -1")
-    print(checkout.checkout("A*B"), "expected -1")
-
-    print("\nSimple A offers:")
-    print(checkout.checkout("AAA"), "expected 130")
-    print(checkout.checkout("AAAAA"), "expected 200")
-    print(checkout.checkout("AAAAAA"), "expected 250")
-    print(checkout.checkout("AAAAAAA"), "expected 300")
-    print(checkout.checkout("AAAAAAAA"), "expected 330")
-
-    print("\nB & E interactions:")
-    print(checkout.checkout("BB"), "expected 45")
-    print(checkout.checkout("BBB"), "expected 75")
-    print(checkout.checkout("E"), "expected 40")
-    print(checkout.checkout("EEB"), "expected 80")
-    print(checkout.checkout("EEBB"), "expected 110")
-    print(checkout.checkout("EEEEBBB"), "expected 190")
-
-    print("\nMixed baskets:")
-    print(checkout.checkout("ABCD"), "expected 115")
-    print(checkout.checkout("ABCDE"), "expected 155")
-    print(checkout.checkout("AAABBBCCCDDD"), "expected 310")
-    print(checkout.checkout("AAAAAAAABBBBBBBBBCCCDDD"), "expected 645")
-
-    print("\nEdge cases:")
-    print(checkout.checkout(""), "expected 0")
 
 
