@@ -1,4 +1,5 @@
 from collections import Counter
+from string import ascii_uppercase
 
 class CheckoutSolution:
 
@@ -155,32 +156,7 @@ class CheckoutSolution:
             return -1
 
         # amounts
-        amount_of_A = counts.get('A', 0)
-        amount_of_B = counts.get('B', 0)
-        amount_of_C = counts.get('C', 0)
-        amount_of_D = counts.get('D', 0)
-        amount_of_E = counts.get('E', 0)
-        amount_of_F = counts.get('F', 0)
-        amount_of_G = counts.get('G', 0)
-        amount_of_H = counts.get('H', 0)
-        amount_of_I = counts.get('I', 0)
-        amount_of_J = counts.get('J', 0)
-        amount_of_K = counts.get('K', 0)
-        amount_of_L = counts.get('L', 0)
-        amount_of_M = counts.get('M', 0)
-        amount_of_N = counts.get('N', 0)
-        amount_of_O = counts.get('O', 0)
-        amount_of_P = counts.get('P', 0)
-        amount_of_Q = counts.get('Q', 0)
-        amount_of_R = counts.get('R', 0)
-        amount_of_S = counts.get('S', 0)
-        amount_of_T = counts.get('T', 0)
-        amount_of_U = counts.get('U', 0)
-        amount_of_V = counts.get('V', 0)
-        amount_of_W = counts.get('W', 0)
-        amount_of_X = counts.get('X', 0)
-        amount_of_Y = counts.get('Y', 0)
-        amount_of_Z = counts.get('Z', 0)
+        amount = {sku: counts.get(sku, 0) for sku in ascii_uppercase}
 
         # Offers that give freebies affecting other items:
         total_E, effective_B = self.price_E(amount_of_E, amount_of_B)
@@ -304,6 +280,7 @@ if __name__ == "__main__":
 
     print("\nEdge cases:")
     print(checkout.checkout(""), "expected 0")
+
 
 
 
