@@ -38,16 +38,24 @@ class CheckoutSolution:
 
     def price_A(self, amount):
         unit_price = UNIT_PRICE['A']
-        best = amount * unit_price
-        for num5 in range(amount // 5 + 1):
-            rem_after_5 = amount - 5 * num5
-            for num3 in range(rem_after_5 // 3 + 1):
-                rem = rem_after_5 - 3 * num3
-                total = num5 * BUNDLE_DEALS["A"]["PRICE_FOR_5"] \
-                        + num3 * BUNDLE_DEALS["A"]["PRICE_FOR_3"] \
-                        + rem * unit_price
-                best = min(best, total)
-        return best
+        lowest_total_price = amount * unit_price  # baseline with no discounts applied
+
+        # Explore all possible mixes of 5-pack and 3-pack bundles
+        for num_five_pack_bundles in range(amount // 5 + 1):
+            remaining_after_fives = amount - 5 * num_five_pack_bundles
+
+            for num_three_pack_bundles in range(remaining_after_fives // 3 + 1):
+                remaining_singles = remaining_after_fives - 3 * num_three_pack_bundles
+
+                total_for_this_combo = (
+                    num_five_pack_bundles * BUNDLE_DEALS["A"]["PRICE_FOR_5"]
+                    + num_three_pack_bundles * BUNDLE_DEALS["A"]["PRICE_FOR_3"]
+                    + remaining_singles * unit_price
+                )
+
+                lowest_total_price = min(lowest_total_price, total_for_this_combo)
+
+        return lowest_total_price
 
     def price_B(self, amount):
         unit_price = UNIT_PRICE['B']
@@ -60,9 +68,15 @@ class CheckoutSolution:
 
     def price_F(self, amount):
         unit_price = UNIT_PRICE['F']
-        grounit_prices = amount // 3
-        rem = amount % 3
-        return grounit_prices * BUNDLE_DEALS["F"]["PRICE_FOR_3"] + rem * unit_price
+        amount_of_discount_sets = amount // 3        # every 3 F’s form one “buy 2 get 1 free” set
+        remaining_singles = amount % 3               # leftover F’s not part of a set
+
+        total_price = (
+            amount_of_discount_sets * BUNDLE_DEALS["F"]["PRICE_FOR_3"]
+            + remaining_singles * unit_price
+        )
+        return total_price
+
 
     def price_G(self, amount): return amount * UNIT_PRICE['G']
 
@@ -156,13 +170,13 @@ class CheckoutSolution:
 
     # ----------- Freebie adjusters -----------
 
-    def calculate_amount_of_B(self, amount_B, amount_E):
+    def calculate_new_amount_of_B(self, amount_B, amount_E):
         return max(0, amount_B - (amount_E // 2))
 
-    def calculate_amount_of_Q(self, amount_Q, amount_R):
+    def calculate_new_amount_of_Q(self, amount_Q, amount_R):
         return max(0, amount_Q - (amount_R // 3))
 
-    def calculate_amount_of_M(self, amount_M, amount_N):
+    def calculate_new_amount_of_M(self, amount_M, amount_N):
         return max(0, amount_M - (amount_N // 3))
 
     # ----------- Grounit_price offer STXYZ -----------
@@ -193,15 +207,20 @@ class CheckoutSolution:
             return -1
 
         amount = {sku: counts.get(sku, 0) for sku in ascii_uppercase}
-        freebie_adjusted_B = self.calculate_amount_of_B(amount['B'], amount['E'])
-        freebie_adjusted_M = self.calculate_amount_of_M(amount['M'], amount['N'])
-        freebie_adjusted_Q = self.calculate_amount_of_Q(amount['Q'], amount['R'])
 
-        override_counts = {'B': freebie_adjusted_B,
-                           'M': freebie_adjusted_M,
-                           'Q': freebie_adjusted_Q}
+        # renamed: calculate_amount_of_X -> calculate_new_amount_of_X
+        freebie_adjusted_B = self.calculate_new_amount_of_B(amount['B'], amount['E'])
+        freebie_adjusted_M = self.calculate_new_amount_of_M(amount['M'], amount['N'])
+        freebie_adjusted_Q = self.calculate_new_amount_of_Q(amount['Q'], amount['R'])
 
-        grounit_price_total = self.group_price_calculator_STXYZ({k: amount[k] for k in ('S', 'T', 'X', 'Y', 'Z')})
+        override_counts = {
+            'B': freebie_adjusted_B,
+            'M': freebie_adjusted_M,
+            'Q': freebie_adjusted_Q,
+        }
+
+        # Calculate group pricing for STXYZ
+        group_pricing_totals = self.group_price_calculator_STXYZ({k: amount[k] for k in ('S', 'T', 'X', 'Y', 'Z')})
         for k in ('S', 'T', 'X', 'Y', 'Z'):
             override_counts[k] = 0
 
@@ -211,7 +230,8 @@ class CheckoutSolution:
             if getattr(self, f"price_{sku}", None) and override_counts.get(sku, amount[sku]) > 0
         )
 
-        return grounit_price_total + items_total
+        return group_pricing_totals + items_total
+
 
 
 if __name__ == "__main__":
@@ -222,3 +242,4 @@ if __name__ == "__main__":
     print(checkout.checkout("INVALID"))  # Should return -1
     print(checkout.checkout(""))        # Should return 0
     print(checkout.checkout("A"))       # Should return 50
+
