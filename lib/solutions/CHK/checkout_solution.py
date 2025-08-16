@@ -24,6 +24,33 @@ class CheckoutSolution:
                 total = num5 * 200 + num3 * 130 + leftover * 50
                 best = min(best, total)
         return best
+    
+    def price_B(self, amount):
+        # B Calculation
+        discount_B = amount // 2
+        remainder_B = amount % 2
+        return discount_B * 45 + remainder_B * 30
+
+    def price_C(self, amount):
+        # C Calculation
+        return amount * 20
+
+    def price_D(self, amount):
+        # D Calculation
+        return amount * 15
+    
+    def price_E(self, amount_E, amount_B):
+        # E Calculation
+        free_Bs = amount_E // 2
+        effective_B = max(0, amount_B - free_Bs)
+        total_E = amount_E * 40
+        return total_E, effective_B
+
+    
+    def price_F(self, amount):
+        discount_F = amount // 3
+        new_amount_of_F = amount - discount_F
+        total_F = new_amount_of_F * 10
 
     
 
@@ -45,25 +72,25 @@ class CheckoutSolution:
         # A Calculation
         total_A = self.price_A(amount_of_A)
 
-
         # E Calculation
-        free_Bs = amount_of_E // 2
-        effective_B = max(0, amount_of_B - free_Bs)
-        total_E = amount_of_E * 40
+        total_E, effective_B = self.price_E(amount_of_E, amount_of_B)
 
         # B Calculation
-        discount_B = effective_B // 2
-        remainder_B = effective_B % 2
-        total_B = discount_B * 45 + remainder_B * 30
+        total_B = self.price_B(effective_B)
+
+        # C Calculation
+        total_C = self.price_C(amount_of_C)
+
+        # D Calculation
+        total_D = self.price_D(amount_of_D)
 
         # F Calculation
-        discount_F = amount_of_F // 3
-        new_amount_of_F = amount_of_F - discount_F
-        total_F = new_amount_of_F * 10
+        total_F = self.price_F(amount_of_F)
 
-        total = (amount_of_D * 15) + (amount_of_C * 20) + (total_A) + (total_B) + (total_E) + (total_F)
 
-        return total
+        return (total_A + total_B + total_C + total_D + total_E + total_F)
+
+
     
 
 
@@ -111,6 +138,7 @@ if __name__ == "__main__":
 
     print("\nEdge cases:")
     print(checkout.checkout(""), "expected 0")
+
 
 
 
