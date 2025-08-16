@@ -3,15 +3,28 @@ from collections import Counter
 
 class CheckoutSolution:
 
+
+    def _validate_and_count(self, skus):
+
+        if not isinstance(skus, str):
+            return None
+        if skus == "":
+            return Counter()  # empty is valid -> totals 0
+        allowed = {"A", "B", "C", "D"}
+        if any(ch not in allowed for ch in skus):
+            return None
+        return Counter(skus)
+
     # skus = unicode string
     def checkout(self, skus):
-        individual_items = list(skus)
-        item_counts = Counter(skus)
+        counts = self._validate_and_count(skus)
+        if counts is None:
+            return -1
 
-        amount_of_A = item_counts.get('A', 0)
-        amount_of_B = item_counts.get('B', 0)
-        amount_of_C = item_counts.get('C', 0)
-        amount_of_D = item_counts.get('D', 0)
+        amount_of_A = counts.get('A', 0)
+        amount_of_B = counts.get('B', 0)
+        amount_of_C = counts.get('C', 0)
+        amount_of_D = counts.get('D', 0)
 
         discount_A = (amount_of_A // 3)
         discount_B = (amount_of_B // 2)
@@ -28,4 +41,8 @@ if __name__ == "__main__":
     print(checkout.checkout("ABCD"))  # Example usage
     print(checkout.checkout("AAABBBCCCDDD"))  # Another example
     print(checkout.checkout("AAAAAAAABBBBBBBBBCCCDDD"))  # Another example
+    print(checkout.checkout("-"))  # Another example
+    print(checkout.checkout("ABCd"))  # Another example
+
+
 
