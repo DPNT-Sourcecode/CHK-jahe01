@@ -106,20 +106,18 @@ class CheckoutSolution:
         amount = {sku: counts.get(sku, 0) for sku in ascii_uppercase}
 
         # Compute totals for the “giver” items (E, N, R) normally
-        total_E = self.price_E(amount['E'])
-        total_N = self.price_N(amount['N'])
-        total_R = self.price_R(amount['R'])
 
         # Adjust the affected items’ counts (B, M, Q) using helpers
-        eff_B = self.adjust_B_for_E(amount['B'], amount['E'])
-        eff_M = self.adjust_M_for_N(amount['M'], amount['N'])
-        eff_Q = self.adjust_Q_for_R(amount['Q'], amount['R'])
+        amount['B'] = self.adjust_B_for_E(amount['B'], amount['E'])
+        amount['M'] = self.adjust_M_for_N(amount['M'], amount['N'])
+        amount['Q'] = self.adjust_Q_for_R(amount['Q'], amount['R'])
 
         # Price all other items (with adjusted counts where applicable)
         total_A = self.price_A(amount['A'])
-        total_B = self.price_B(eff_B)
+        total_B = self.price_B(amount['B'])
         total_C = self.price_C(amount['C'])
         total_D = self.price_D(amount['D'])
+        total_E = self.price_E(amount['E'])
         total_F = self.price_F(amount['F'])
         total_G = self.price_G(amount['G'])
         total_H = self.price_H(amount['H'])
@@ -127,10 +125,12 @@ class CheckoutSolution:
         total_J = self.price_J(amount['J'])
         total_K = self.price_K(amount['K'])
         total_L = self.price_L(amount['L'])
-        total_M = self.price_M(eff_M)
+        total_M = self.price_M(amount['M'])
+        total_N = self.price_N(amount['N'])
         total_O = self.price_O(amount['O'])
         total_P = self.price_P(amount['P'])
-        total_Q = self.price_Q(eff_Q)
+        total_Q = self.price_Q(amount['Q'])
+        total_R = self.price_R(amount['R'])
         total_S = self.price_S(amount['S'])
         total_T = self.price_T(amount['T'])
         total_U = self.price_U(amount['U'])
@@ -232,6 +232,7 @@ if __name__ == "__main__":
 
     print("\nEdge cases:")
     print(checkout.checkout(""), "expected 0")
+
 
 
 
